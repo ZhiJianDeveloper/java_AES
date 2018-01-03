@@ -1,6 +1,3 @@
-# java_AES
-java AES加密解密示例代码
-
 package com.zhijian.util;
 
 import javax.crypto.Cipher;
@@ -15,7 +12,7 @@ public class AES {
 	private static String encrypt_type = "AES/CBC/PKCS5Padding";
 
 	/**
-	 *  π”√‘≠ º√ÿ‘øΩ‚√‹
+	 * 使用原始秘钥解密
 	 * 
 	 * @author yuanzc
 	 * @time 2017-6-14
@@ -32,7 +29,7 @@ public class AES {
 	}
 
 	/**
-	 * ƒ¨»œ√‹‘øº”√‹
+	 * 默认密钥加密
 	 * 
 	 * @author yuanzc
 	 * @time 2017-6-14
@@ -49,7 +46,7 @@ public class AES {
 	}
 
 	/**
-	 *  π”√◊‘∂®“Âº”√‹
+	 * 使用自定义加密
 	 * 
 	 * @param content
 	 * @param ivp
@@ -59,25 +56,25 @@ public class AES {
 	 */
 	public static String encrypt(String content, String ivp, String ascKey) throws Exception {
 		if (ascKey == null) {
-			throw new RuntimeException("ascKey≤ªƒ‹Œ™ø’");
+			throw new RuntimeException("ascKey不能为空");
 		}
-		// ≈–∂œKey «∑ÒŒ™16Œª
+		// 判断Key是否为16位
 		if (ascKey.length() != 16) {
-			throw new RuntimeException("ascKey≥§∂»≤ª «16Œª");
+			throw new RuntimeException("ascKey长度不是16位");
 		}
 		byte[] raw = ascKey.getBytes(charset);
 		SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-		Cipher cipher = Cipher.getInstance(encrypt_type);// "À„∑®/ƒ£ Ω/≤π¬Î∑Ω Ω"
-		IvParameterSpec ips = new IvParameterSpec(ivp.getBytes(charset));//  π”√CBCƒ£ Ω£¨–Ë“™“ª∏ˆœÚ¡øiv£¨ø…‘ˆº”º”√‹À„∑®µƒ«ø∂»
+		Cipher cipher = Cipher.getInstance(encrypt_type);// "算法/模式/补码方式"
+		IvParameterSpec ips = new IvParameterSpec(ivp.getBytes(charset));// 使用CBC模式，需要一个向量iv，可增加加密算法的强度
 		cipher.init(Cipher.ENCRYPT_MODE, skeySpec, ips);
 		byte[] encrypted = cipher.doFinal(content.getBytes(charset));
-		String encrypt_content = Base64Utils.encodeToString(encrypted);// ¥À¥¶ π”√BASE64◊ˆ◊™¬Îπ¶ƒ‹£¨Õ¨ ±ƒ‹∆µΩ2¥Œº”√‹µƒ◊˜”√°£
+		String encrypt_content = Base64Utils.encodeToString(encrypted);// 此处使用BASE64做转码功能，同时能起到2次加密的作用。
 		encrypt_content = encrypt_content.replaceAll("\\r", "").replaceAll("\\n", "");
 		return encrypt_content;
 	}
 
 	/**
-	 *  π”√◊‘∂®“ÂΩ‚√‹
+	 * 使用自定义解密
 	 * 
 	 * @param content
 	 * @param ivp
@@ -86,20 +83,20 @@ public class AES {
 	 * @throws Exception
 	 */
 	public static String dencrypt(String content, String ivp, String ascKey) throws Exception {
-		// ≈–∂œKey «∑Ò’˝»∑
+		// 判断Key是否正确
 		if (ascKey == null) {
-			throw new RuntimeException("ascKey≤ªƒ‹Œ™ø’");
+			throw new RuntimeException("ascKey不能为空");
 		}
-		// ≈–∂œKey «∑ÒŒ™16Œª
+		// 判断Key是否为16位
 		if (ascKey.length() != 16) {
-			throw new RuntimeException("ascKey≥§∂»≤ª «16Œª");
+			throw new RuntimeException("ascKey长度不是16位");
 		}
 		byte[] raw = ascKey.getBytes(charset);
 		SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
 		Cipher cipher = Cipher.getInstance(encrypt_type);
 		IvParameterSpec ips = new IvParameterSpec(ivp.getBytes(charset));
 		cipher.init(Cipher.DECRYPT_MODE, skeySpec, ips);
-		byte[] encrypted1 = Base64Utils.decodeFromString(content);// œ»”√base64Ω‚√‹
+		byte[] encrypted1 = Base64Utils.decodeFromString(content);// 先用base64解密
 		byte[] original = cipher.doFinal(encrypted1);
 		String originalString = new String(original, charset);
 		return originalString;
@@ -111,4 +108,3 @@ public class AES {
 	}
 
 }
-
